@@ -1,6 +1,5 @@
 ﻿@page
-@model CreateModel
-
+@model DoctorAppointment.RazorPages.Areas.Admin.Pages.Appointments.CreateModel
 @{
     ViewData["Title"] = "Create Appointment";
 }
@@ -12,21 +11,31 @@
     <div class="col-md-4">
         <form method="post">
             <div asp-validation-summary="All" class="text-danger"></div>
+
             <div class="form-floating mb-3">
                 <select asp-for="Appointment.PatientId" asp-items="Model.Patients" class="form-select"></select>
                 <label asp-for="Appointment.PatientId" class="form-label"></label>
                 <span asp-validation-for="Appointment.PatientId" class="text-danger"></span>
             </div>
+
             <div class="form-floating mb-3">
                 <select asp-for="Appointment.DoctorId" asp-items="Model.Doctors" class="form-select"></select>
                 <label asp-for="Appointment.DoctorId" class="form-label"></label>
                 <span asp-validation-for="Appointment.DoctorId" class="text-danger"></span>
             </div>
+
             <div class="form-floating mb-3">
-                <input asp-for="Appointment.Date" class="form-control" min='@DateTime.Now.ToString("yyyy-MM-dd hh:mm")' />
+                <select asp-for="Appointment.StaffId" asp-items="Model.Staff" class="form-select"></select>
+                <label asp-for="Appointment.StaffId" class="form-label"></label>
+                <span asp-validation-for="Appointment.StaffId" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Appointment.Date" class="form-control" type="datetime-local" min='@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")' />
                 <label asp-for="Appointment.Date" class="form-label"></label>
                 <span asp-validation-for="Appointment.Date" class="text-danger"></span>
             </div>
+
             <input type="submit" value="Create" class="btn btn-success" />
             <a asp-page="Index" class="btn btn-secondary">Back to List</a>
         </form>
@@ -34,7 +43,5 @@
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    <partial name="_ValidationScriptsPartial" />
 }

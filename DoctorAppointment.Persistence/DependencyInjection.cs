@@ -32,6 +32,7 @@ namespace DoctorAppointment.Persistence
             ArgumentNullException.ThrowIfNull(services);
 
             return services.AddScoped<IAppointmentRepository, AppointmentRepository>();
+
         }
     }
 }

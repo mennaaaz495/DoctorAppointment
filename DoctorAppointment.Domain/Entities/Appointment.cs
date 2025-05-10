@@ -8,6 +8,8 @@ namespace DoctorAppointment.Domain.Entities
 
         public int DoctorId { get; set; }
 
+        public int? StaffId { get; set; } // ✅ Optional staff member
+
         public DateTime Date { get; set; }
 
         public AppointmentStatus Status { get; set; }
@@ -15,6 +17,8 @@ namespace DoctorAppointment.Domain.Entities
         public virtual ApplicationUser Patient { get; set; }
 
         public virtual ApplicationUser Doctor { get; set; }
+
+        public virtual ApplicationUser? Staff { get; set; } // ✅ Navigation property
     }
 
     public enum AppointmentStatus

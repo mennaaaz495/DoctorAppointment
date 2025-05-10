@@ -44,7 +44,16 @@ namespace DoctorAppointment.Persistence.Extensions
                 ConcurrencyStamp = Guid.NewGuid().ToString()
             };
 
-            modelBuilder.Entity<ApplicationRole>().HasData(adminRole, patientRole, doctorRole);
+            ApplicationRole staffRole = new() // Add Staff role here
+            {
+                Id = 4,
+                Name = "Staff",
+                NormalizedName = "STAFF",
+                Description = "Staff can manage appointments and generate bills after doctor approval.",
+                ConcurrencyStamp = Guid.NewGuid().ToString()
+            };
+
+            modelBuilder.Entity<ApplicationRole>().HasData(adminRole, patientRole, doctorRole, staffRole); // Include Staff role
         }
 
         private static void SeedUsers(this ModelBuilder modelBuilder)
@@ -88,12 +97,27 @@ namespace DoctorAppointment.Persistence.Extensions
                 SecurityStamp = Guid.NewGuid().ToString()
             };
 
+            // Add Staff user here
+            ApplicationUser staffUser = new()
+            {
+                Id = 4,
+                FirstName = "John",
+                LastName = "Doe",
+                UserName = "john.doe",
+                NormalizedUserName = "JOHN.DOE",
+                Email = "john.doe@email.com",
+                NormalizedEmail = "JOHN.DOE@EMAIL.COM",
+                EmailConfirmed = true,
+                SecurityStamp = Guid.NewGuid().ToString()
+            };
+
             PasswordHasher<ApplicationUser> hasher = new();
             adminUser.PasswordHash = hasher.HashPassword(adminUser, "admin");
             patientUser.PasswordHash = hasher.HashPassword(patientUser, "avalkova");
             doctorUser.PasswordHash = hasher.HashPassword(doctorUser, "dyosifova");
+            staffUser.PasswordHash = hasher.HashPassword(staffUser, "johndoe"); // Staff user password
 
-            modelBuilder.Entity<ApplicationUser>().HasData(adminUser, patientUser, doctorUser);
+            modelBuilder.Entity<ApplicationUser>().HasData(adminUser, patientUser, doctorUser, staffUser);
         }
 
         private static void SeedUserRoles(this ModelBuilder modelBuilder)
@@ -116,7 +140,13 @@ namespace DoctorAppointment.Persistence.Extensions
                 UserId = 3
             };
 
-            modelBuilder.Entity<ApplicationUserRole>().HasData(adminUserRole, patientUserRole, doctorUserRole);
+            ApplicationUserRole staffUserRole = new() // Add Staff user role
+            {
+                RoleId = 4,  // Staff role ID is 4
+                UserId = 4   // Staff user ID is 4
+            };
+
+            modelBuilder.Entity<ApplicationUserRole>().HasData(adminUserRole, patientUserRole, doctorUserRole, staffUserRole); // Include Staff user role
         }
 
         private static void SeedAppointments(this ModelBuilder modelBuilder)

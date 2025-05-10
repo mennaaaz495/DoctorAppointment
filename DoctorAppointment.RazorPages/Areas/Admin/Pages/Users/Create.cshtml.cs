@@ -43,34 +43,24 @@ namespace DoctorAppointment.RazorPages.Areas.Admin.Pages.Users
                 return Page();
             }
 
-            IdentityResult createUserResult = await _userManager.CreateAsync(ApplicationUser);
+            var user = (ApplicationUser)ApplicationUser;
 
+            var createUserResult = await _userManager.CreateAsync(user, ApplicationUser.Password);
             if (!createUserResult.Succeeded)
             {
                 ModelState.AddModelIdentityErrors(createUserResult);
-
                 PopulateRoles();
                 return Page();
             }
 
             if (UserRoles.Any())
             {
-                if (await _userManager.FindByNameAsync(ApplicationUser.Username) is ApplicationUser user)
+                var addRolesResult = await _userManager.AddToRolesAsync(user, UserRoles);
+                if (!addRolesResult.Succeeded)
                 {
-                    IdentityResult addUserRolesResult = await _userManager.AddToRolesAsync(user, UserRoles);
-
-                    if (!addUserRolesResult.Succeeded)
-                    {
-                        ModelState.AddModelIdentityErrors(addUserRolesResult);
-
-                        PopulateRoles();
-                        return Page();
-                    }
-                }
-
-                else
-                {
-                    return NotFound();
+                    ModelState.AddModelIdentityErrors(addRolesResult);
+                    PopulateRoles();
+                    return Page();
                 }
             }
 

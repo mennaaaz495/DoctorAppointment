@@ -23,12 +23,18 @@ namespace DoctorAppointment.RazorPages.Areas.Admin.Models.Users
 
         [Required]
         [MaxLength(256)]
+        [DisplayName("Username")]
         public string Username { get; set; }
 
         [Required]
         [MaxLength(256)]
         [EmailAddress]
         public string Email { get; set; }
+
+        [Required]
+        [DataType(DataType.Password)]
+        [DisplayName("Password")]
+        public string Password { get; set; }
 
         public static implicit operator UserModel(ApplicationUser user)
         {
@@ -38,7 +44,8 @@ namespace DoctorAppointment.RazorPages.Areas.Admin.Models.Users
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Username = user.UserName,
-                Email = user.Email
+                Email = user.Email,
+                Password = null // Never map password from DB
             };
         }
 
@@ -51,6 +58,7 @@ namespace DoctorAppointment.RazorPages.Areas.Admin.Models.Users
                 LastName = model.LastName,
                 UserName = model.Username,
                 Email = model.Email
+                // Password is passed to UserManager separately
             };
         }
     }

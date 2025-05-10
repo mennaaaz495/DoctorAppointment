@@ -2,11 +2,13 @@
 using DoctorAppointment.Domain.Interfaces.Services;
 using DoctorAppointment.RazorPages.Areas.Patient.Models.Appointments;
 using DoctorAppointment.RazorPages.Extensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using static DoctorAppointment.Domain.Entities.AppointmentStatus;
 
 namespace DoctorAppointment.RazorPages.Areas.Patient.Pages.Appointments
 {
+    [Authorize(Policy = "PatientOnly")]
     public class IndexModel : PageModel
     {
         private readonly IAppointmentService _appointmentService;

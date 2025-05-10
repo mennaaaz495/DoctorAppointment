@@ -19,7 +19,10 @@ namespace DoctorAppointment.RazorPages.Areas.Admin.Pages.Appointments
         private readonly IAppointmentPolicy _appointmentPolicy;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public CreateModel(IAppointmentService appointmentService, IAppointmentPolicy appointmentPolicy, UserManager<ApplicationUser> userManager)
+        public CreateModel(
+            IAppointmentService appointmentService,
+            IAppointmentPolicy appointmentPolicy,
+            UserManager<ApplicationUser> userManager)
         {
             _appointmentService = appointmentService;
             _appointmentPolicy = appointmentPolicy;
@@ -30,8 +33,8 @@ namespace DoctorAppointment.RazorPages.Areas.Admin.Pages.Appointments
         public AppointmentWriteModel Appointment { get; set; } = default!;
 
         public SelectList Patients { get; set; } = default!;
-
         public SelectList Doctors { get; set; } = default!;
+        public SelectList Staff { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync()
         {
@@ -52,7 +55,6 @@ namespace DoctorAppointment.RazorPages.Areas.Admin.Pages.Appointments
             if (canCreateResult.IsFailure)
             {
                 ModelState.AddModelError(string.Empty, canCreateResult.Error.Description);
-
                 await PopulateSelectLists();
                 return Page();
             }
@@ -64,7 +66,6 @@ namespace DoctorAppointment.RazorPages.Areas.Admin.Pages.Appointments
             catch (DbUpdateException)
             {
                 ModelState.AddModelError(string.Empty, "An error occurred while creating the appointment!");
-
                 await PopulateSelectLists();
                 return Page();
             }
@@ -76,6 +77,7 @@ namespace DoctorAppointment.RazorPages.Areas.Admin.Pages.Appointments
         {
             Patients = (await _userManager.GetUsersInRoleAsync(Constants.Roles.Patient)).ToSelectList();
             Doctors = (await _userManager.GetUsersInRoleAsync(Constants.Roles.Doctor)).ToSelectList();
+            Staff = (await _userManager.GetUsersInRoleAsync(Constants.Roles.Staff)).ToSelectList();
         }
     }
 }

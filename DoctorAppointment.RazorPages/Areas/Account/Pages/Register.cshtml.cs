@@ -11,11 +11,16 @@ namespace DoctorAppointment.RazorPages.Areas.Account.Pages
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly RoleManager<ApplicationRole> _roleManager;
 
-        public RegisterModel(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        public RegisterModel(
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
+            RoleManager<ApplicationRole> roleManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _roleManager = roleManager;
         }
 
         [BindProperty]
@@ -33,19 +38,28 @@ namespace DoctorAppointment.RazorPages.Areas.Account.Pages
                 return Page();
             }
 
-            ApplicationUser user = Registration;
-
-            IdentityResult registerUserResult = await _userManager.CreateAsync(user, Registration.Password);
-
-            if (!registerUserResult.Succeeded)
+            var user = new ApplicationUser
             {
-                ModelState.AddModelIdentityErrors(registerUserResult);
+                UserName = Registration.Username,
+                Email = Registration.Email,
+                FirstName = Registration.FirstName,
+                LastName = Registration.LastName
+            };
+
+            // Create user
+            var result = await _userManager.CreateAsync(user, Registration.Password);
+            if (!result.Succeeded)
+            {
+                ModelState.AddModelIdentityErrors(result);
                 return Page();
             }
 
+          
+            await _userManager.AddToRoleAsync(user, "Patient");
+
             await _signInManager.SignInAsync(user, isPersistent: false);
 
-            return RedirectToPage("./Index");
+            return RedirectToPage("/Appointments/Index", new { area = "Patient" });
         }
     }
 }

@@ -17,7 +17,7 @@ namespace DoctorAppointment.Persistence.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.7")
+                .HasAnnotation("ProductVersion", "8.0.15")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -39,6 +39,9 @@ namespace DoctorAppointment.Persistence.Migrations
                     b.Property<int>("PatientId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("StaffId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -48,13 +51,15 @@ namespace DoctorAppointment.Persistence.Migrations
 
                     b.HasIndex("PatientId");
 
+                    b.HasIndex("StaffId");
+
                     b.ToTable("Appointments");
 
                     b.HasData(
                         new
                         {
                             Id = 1,
-                            Date = new DateTime(2024, 7, 15, 12, 13, 38, 454, DateTimeKind.Local).AddTicks(2747),
+                            Date = new DateTime(2025, 5, 13, 23, 47, 54, 769, DateTimeKind.Local).AddTicks(1615),
                             DoctorId = 3,
                             PatientId = 2,
                             Status = 0
@@ -62,7 +67,7 @@ namespace DoctorAppointment.Persistence.Migrations
                         new
                         {
                             Id = 2,
-                            Date = new DateTime(2024, 7, 14, 12, 13, 38, 454, DateTimeKind.Local).AddTicks(2814),
+                            Date = new DateTime(2025, 5, 12, 23, 47, 54, 769, DateTimeKind.Local).AddTicks(1677),
                             DoctorId = 3,
                             PatientId = 2,
                             Status = 1
@@ -70,11 +75,48 @@ namespace DoctorAppointment.Persistence.Migrations
                         new
                         {
                             Id = 3,
-                            Date = new DateTime(2024, 7, 13, 12, 13, 38, 454, DateTimeKind.Local).AddTicks(2817),
+                            Date = new DateTime(2025, 5, 11, 23, 47, 54, 769, DateTimeKind.Local).AddTicks(1679),
                             DoctorId = 3,
                             PatientId = 2,
                             Status = 2
                         });
+                });
+
+            modelBuilder.Entity("DoctorAppointment.Domain.Entities.Bill", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("AppointmentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("GeneratedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("GeneratedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsPaid")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppointmentId");
+
+                    b.HasIndex("GeneratedById");
+
+                    b.ToTable("Bills");
                 });
 
             modelBuilder.Entity("DoctorAppointment.Domain.Entities.Identity.ApplicationRole", b =>
@@ -114,7 +156,7 @@ namespace DoctorAppointment.Persistence.Migrations
                         new
                         {
                             Id = 1,
-                            ConcurrencyStamp = "ffea4d94-ab5b-43cc-915a-81aa890b8578",
+                            ConcurrencyStamp = "e1576aea-e98e-4727-b974-9ada03edfae5",
                             Description = "Administrator can access and manage all data.",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
@@ -122,7 +164,7 @@ namespace DoctorAppointment.Persistence.Migrations
                         new
                         {
                             Id = 2,
-                            ConcurrencyStamp = "7cad8e26-b07f-43ff-b7ee-d339a6d351c3",
+                            ConcurrencyStamp = "ee0d4a1a-76e7-4e44-98fc-8c1c77b6e3cd",
                             Description = "Patient can make appointment requests.",
                             Name = "Patient",
                             NormalizedName = "PATIENT"
@@ -130,10 +172,18 @@ namespace DoctorAppointment.Persistence.Migrations
                         new
                         {
                             Id = 3,
-                            ConcurrencyStamp = "5ee0798a-33c2-4eb2-a196-ce04cd2d9263",
+                            ConcurrencyStamp = "a312c7be-1aca-45c7-90ce-ba1c961e3fd2",
                             Description = "Doctor can approve or decline appointments.",
                             Name = "Doctor",
                             NormalizedName = "DOCTOR"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            ConcurrencyStamp = "53f05914-29d8-4a8c-bc68-066a11fb21d2",
+                            Description = "Staff can manage appointments and generate bills after doctor approval.",
+                            Name = "Staff",
+                            NormalizedName = "STAFF"
                         });
                 });
 
@@ -219,7 +269,7 @@ namespace DoctorAppointment.Persistence.Migrations
                         {
                             Id = 1,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "e30080f0-2c00-4804-b8f5-3fb1ab46c241",
+                            ConcurrencyStamp = "14738902-4314-48e2-b25c-cecab751d5d2",
                             Email = "admin@email.com",
                             EmailConfirmed = true,
                             FirstName = "Admin",
@@ -227,9 +277,9 @@ namespace DoctorAppointment.Persistence.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EMAIL.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEGar3u0CC2N7erwuyQSoIHVjehpdzQ8p/sRZn/GNym+xob5IM7ypfrXotCoQD6C9yw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEAEdZw5XOUCtAusQNhVMixKdSroOuGP7Fl2I08WJospcYyFMdiYGj+6Y/obiSBWGHg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "fe560e1b-be47-4b53-ac29-8afdf650e260",
+                            SecurityStamp = "49e23fe4-6d6e-4c77-a4c1-9f2eda7a1bc1",
                             TwoFactorEnabled = false,
                             UserName = "admin"
                         },
@@ -237,7 +287,7 @@ namespace DoctorAppointment.Persistence.Migrations
                         {
                             Id = 2,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "097e7e95-7e0b-4f0c-ad89-8cf9da3386fb",
+                            ConcurrencyStamp = "132ea7f0-c09b-4bc3-a2fe-a10e7994b99d",
                             Email = "alexandra.valkova@email.com",
                             EmailConfirmed = true,
                             FirstName = "Alexandra",
@@ -245,9 +295,9 @@ namespace DoctorAppointment.Persistence.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ALEXANDRA.VALKOVA@EMAIL.COM",
                             NormalizedUserName = "ALEXANDRA.VALKOVA",
-                            PasswordHash = "AQAAAAIAAYagAAAAEHENfouxnBlrR3th4mxGZNU5A25Qx5kHjBHdpIKeXRrejvP90BBdjTzwf7oivSH4QA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOJ74aDf2S2g0V2LQ/VZX1MoCTZdOow+c+jF26IPZYdDP2nN1VlLoBnjZOas8QpbCQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "7954084e-89df-4e39-bdfa-bd01e27d5080",
+                            SecurityStamp = "c26f03a8-4216-475a-8fe3-886ff95ec871",
                             TwoFactorEnabled = false,
                             UserName = "alexandra.valkova"
                         },
@@ -255,7 +305,7 @@ namespace DoctorAppointment.Persistence.Migrations
                         {
                             Id = 3,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "fddd37fd-90f6-43e7-9f42-258bba649def",
+                            ConcurrencyStamp = "90259318-b789-495c-8794-005a56395569",
                             Email = "diana.yosifova@email.com",
                             EmailConfirmed = true,
                             FirstName = "Diana",
@@ -263,11 +313,29 @@ namespace DoctorAppointment.Persistence.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "DIANA.YOSIFOVA@EMAIL.COM",
                             NormalizedUserName = "DIANA.YOSIFOVA",
-                            PasswordHash = "AQAAAAIAAYagAAAAENQRFzUExU3qXdSeilbioiXZ6c+ws79YLAWEdxdIEmiVrhFjmoberKuAhmV3TGDu+w==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGdF1OtPqG7XomdkLsIarpTzc0g1+uJLgGN43nPS7aQ/5tVhD+oZVaQNKiyLjYb5kA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "90706ccc-3576-49f8-8123-faed85639aa8",
+                            SecurityStamp = "ccc8c346-2d83-40b6-9f14-35b9a34e3cb7",
                             TwoFactorEnabled = false,
                             UserName = "diana.yosifova"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "6343546a-da76-44bf-b6ce-85dbe0734db7",
+                            Email = "john.doe@email.com",
+                            EmailConfirmed = true,
+                            FirstName = "John",
+                            LastName = "Doe",
+                            LockoutEnabled = false,
+                            NormalizedEmail = "JOHN.DOE@EMAIL.COM",
+                            NormalizedUserName = "JOHN.DOE",
+                            PasswordHash = "AQAAAAIAAYagAAAAEEKq0bND/loQO5R0eA9QOCkKn3Y7krUlPfVQq03W6SEBPMX6gDwH4Lv5yvM4i7TCGQ==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "4354faf6-bc10-42fa-94f3-6c8f531ee7be",
+                            TwoFactorEnabled = false,
+                            UserName = "john.doe"
                         });
                 });
 
@@ -300,6 +368,11 @@ namespace DoctorAppointment.Persistence.Migrations
                         {
                             UserId = 3,
                             RoleId = 3
+                        },
+                        new
+                        {
+                            UserId = 4,
+                            RoleId = 4
                         });
                 });
 
@@ -405,9 +478,34 @@ namespace DoctorAppointment.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("DoctorAppointment.Domain.Entities.Identity.ApplicationUser", "Staff")
+                        .WithMany()
+                        .HasForeignKey("StaffId");
+
                     b.Navigation("Doctor");
 
                     b.Navigation("Patient");
+
+                    b.Navigation("Staff");
+                });
+
+            modelBuilder.Entity("DoctorAppointment.Domain.Entities.Bill", b =>
+                {
+                    b.HasOne("DoctorAppointment.Domain.Entities.Appointment", "Appointment")
+                        .WithMany()
+                        .HasForeignKey("AppointmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("DoctorAppointment.Domain.Entities.Identity.ApplicationUser", "GeneratedBy")
+                        .WithMany()
+                        .HasForeignKey("GeneratedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Appointment");
+
+                    b.Navigation("GeneratedBy");
                 });
 
             modelBuilder.Entity("DoctorAppointment.Domain.Entities.Identity.ApplicationUserRole", b =>

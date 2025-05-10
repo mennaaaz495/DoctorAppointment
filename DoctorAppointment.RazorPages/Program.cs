@@ -1,7 +1,14 @@
 using DoctorAppointment.Application;
+using DoctorAppointment.Application.Features.GeneratePdf;
 using DoctorAppointment.Domain.Entities.Identity;
+using DoctorAppointment.Domain.Interfaces.Repositories;
+using DoctorAppointment.Domain.Interfaces.Repositories.DoctorAppointment.Domain.Interfaces.Repositories;
 using DoctorAppointment.Persistence;
+using DoctorAppointment.Persistence.Repositories;
+using MediatR;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using static DoctorAppointment.Domain.Constants.Database;
 using static DoctorAppointment.Domain.Constants.Roles;
 
@@ -20,32 +27,50 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 }).AddIdentityStorageProvider();
 
 // Repositories and Services
-builder.Services.AddRepositories();
+builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
+builder.Services.AddScoped<IBillRepository, BillRepository>();
 builder.Services.AddServices();
 
-// Authorization
-builder.Services.AddAuthorizationBuilder()
-                .AddPolicy(name: Admin, policy => policy.RequireRole(Admin))
-                .AddPolicy(name: Patient, policy => policy.RequireRole(Patient))
-                .AddPolicy(name: Doctor, policy => policy.RequireRole(Doctor));
-
-builder.Services.AddRazorPages().AddRazorPagesOptions(options =>
+// Fixed MediatR registration (single call with all assemblies)
+builder.Services.AddMediatR(cfg =>
 {
-    options.Conventions.AuthorizeAreaFolder(areaName: Admin, folderPath: "/", policy: Admin);
-    options.Conventions.AuthorizeAreaFolder(areaName: Patient, folderPath: "/", policy: Patient);
-    options.Conventions.AuthorizeAreaFolder(areaName: Doctor, folderPath: "/", policy: Doctor);
-    options.Conventions.AllowAnonymousToAreaPage(areaName: "Account", pageName: "/AccessDenied");
+    cfg.RegisterServicesFromAssemblyContaining<DoctorAppointment.Application.Features.Bills.Commands.Create.CreateBillCommand>();
+    cfg.RegisterServicesFromAssembly(typeof(GeneratePdfInvoiceQueryHandler).Assembly);
+});
+
+builder.Services.Configure<IdentityOptions>(options =>
+{
+    options.ClaimsIdentity.RoleClaimType = ClaimTypes.Role;
+});
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("PatientOnly", policy => policy.RequireRole("Patient"));
+    options.AddPolicy("DoctorOnly", policy => policy.RequireRole("Doctor"));
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("StaffOnly", policy => policy.RequireRole("Staff"));
+});
+
+// Configure Razor Pages area-based authorization
+builder.Services.AddRazorPages(options =>
+{
+    options.Conventions.AuthorizeAreaFolder("Patient", "/", "PatientOnly");
+    options.Conventions.AuthorizeAreaFolder("Doctor", "/", "DoctorOnly");
+   // options.Conventions.AuthorizeAreaFolder("Admin", "/", "AdminOnly");
+    options.Conventions.AuthorizeAreaFolder("Staff", "/", "StaffOnly");
+
+    options.Conventions.AllowAnonymousToAreaPage("Account", "/Login");
+    options.Conventions.AllowAnonymousToAreaPage("Account", "/Register");
 });
 
 builder.Services.AddServerSideBlazor();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// HTTP request pipeline
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 else

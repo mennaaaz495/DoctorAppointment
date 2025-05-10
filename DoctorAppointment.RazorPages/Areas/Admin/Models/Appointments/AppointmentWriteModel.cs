@@ -16,6 +16,9 @@ namespace DoctorAppointment.RazorPages.Areas.Admin.Models.Appointments
         [Display(Name = "Doctor")]
         public int DoctorId { get; set; }
 
+        [Display(Name = "Staff")]
+        public int? StaffId { get; set; }  // ✅ Add this line
+
         [Required]
         [MinDateToday]
         [DataType(DataType.DateTime)]
@@ -31,6 +34,7 @@ namespace DoctorAppointment.RazorPages.Areas.Admin.Models.Appointments
                 Id = appointment.Id,
                 PatientId = appointment.PatientId,
                 DoctorId = appointment.DoctorId,
+                StaffId = appointment.StaffId, // ✅ Add this line if StaffId exists in Appointment entity
                 Date = appointment.Date,
                 Status = appointment.Status
             };
@@ -43,6 +47,7 @@ namespace DoctorAppointment.RazorPages.Areas.Admin.Models.Appointments
                 Id = model.Id,
                 PatientId = model.PatientId,
                 DoctorId = model.DoctorId,
+                StaffId = model.StaffId, // ✅ Add this line if needed
                 Date = model.Date,
                 Status = model.Status
             };

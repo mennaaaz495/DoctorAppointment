@@ -3,7 +3,7 @@
 <ul class="navbar-nav flex-grow-1">
     @if (SignInManager.IsSignedIn(User))
     {
-        if (User.IsInRole(Admin))
+        if (User.IsInRole("Admin"))
         {
             <li class="nav-item">
                 <a class="nav-link text-dark" asp-area="Admin" asp-page="/Users/Index">Users 🧑</a>
@@ -16,18 +16,33 @@
             </li>
         }
 
-        if (User.IsInRole(Patient))
+        if (User.IsInRole("Patient"))
         {
             <li class="nav-item">
-                <a class="nav-link text-dark" asp-area="Patient" asp-page="/Appointments/Index">Appointments 📅</a>
+                <a class="nav-link text-dark" asp-area="Patient" asp-page="/Appointments/Index">AppointmentPatient 📅</a>
             </li>
         }
 
-        if (User.IsInRole(Doctor))
+        if (User.IsInRole("Doctor"))
         {
             <li class="nav-item">
                 <a class="nav-link text-dark" asp-area="Doctor" asp-page="/Appointments/Index">Appointments 📅</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="Admin" asp-page="/Appointments/Index">Manage_Appointments 📅</a>
+            </li>
         }
+        if (User.IsInRole("Staff"))
+        {
+            
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="Staff" asp-page="/Appointments/Index">Appointments 📅</a>
+
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="Admin" asp-page="/Appointments/Index">Manage_Appointments 📅</a>
+            </li>
+        }
+
     }
 </ul>

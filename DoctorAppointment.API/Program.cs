@@ -2,13 +2,18 @@ using System.Text.Json.Serialization;
 using DoctorAppointment.API.Endpoints;
 using DoctorAppointment.API.ExceptionHandlers;
 using DoctorAppointment.Application;
+using DoctorAppointment.Domain.Constants;
 using DoctorAppointment.Domain.Entities.Identity;
 using DoctorAppointment.Persistence;
 using Microsoft.OpenApi.Models;
+using Syncfusion.Licensing;
 using static DoctorAppointment.Domain.Constants.Database;
 using static DoctorAppointment.Domain.Constants.Roles;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Register Syncfusion License
+SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NNaF5cXmBCe0x3Q3xbf1x1ZFBMZFxbRn5PMyBoS35Rc0VmWXZedXBVRGhVU0d/VEBU");
 
 // DB Context
 builder.Services.AddDatabase(builder.Configuration.GetConnectionString(ConnectionStringName) ??
@@ -21,9 +26,10 @@ builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
 
 // Authorization
 builder.Services.AddAuthorizationBuilder()
-                .AddPolicy(name: Admin, policy => policy.RequireRole(Admin))
-                .AddPolicy(name: Patient, policy => policy.RequireRole(Patient))
-                .AddPolicy(name: Doctor, policy => policy.RequireRole(Doctor));
+    .AddPolicy(Roles.Admin, policy => policy.RequireRole(Roles.Admin))
+    .AddPolicy(Roles.Patient, policy => policy.RequireRole(Roles.Patient))
+    .AddPolicy(Roles.Doctor, policy => policy.RequireRole(Roles.Doctor))
+    .AddPolicy(Roles.Staff, policy => policy.RequireRole(Roles.Staff));
 
 builder.Services.AddRepositories();
 builder.Services.AddServices();
@@ -98,7 +104,6 @@ app.UseAuthorization();
 app.UseExceptionHandler();
 
 // Minimal APIs
-
 app.MapGroup("/identity")
    .MapIdentityApi<ApplicationUser>()
    .WithTags("Identity")
@@ -112,6 +117,14 @@ app.MapGroup("/appointments")
    .RequireAuthorization()
    .WithOpenApi();
 
+app.MapGroup("/bills")
+   .MapBillsApi()
+   .WithTags("Bills")
+   .WithGroupName("bills")
+   .RequireAuthorization()
+   .WithOpenApi();
+
 app.MapControllers();
+app.MapRazorPages();
 
 app.Run();

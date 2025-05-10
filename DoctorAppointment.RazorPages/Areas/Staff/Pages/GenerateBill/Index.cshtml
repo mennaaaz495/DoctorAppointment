@@ -1,0 +1,32 @@
+﻿@page
+@model DoctorAppointment.RazorPages.Areas.Staff.Pages.GenerateBill.IndexModel
+@{
+    ViewData["Title"] = "Generate Bill";
+}
+
+<div class="container mt-4">
+    <h2>Generate Bill for Appointment #@Model.Request.AppointmentId</h2>
+
+    <form method="post">
+        <input type="hidden" asp-for="Request.AppointmentId" />
+
+        <div class="mb-3">
+            <label asp-for="Request.Amount" class="form-label">Amount</label>
+            <input asp-for="Request.Amount" class="form-control" type="number" step="0.01" min="0" />
+            <span asp-validation-for="Request.Amount" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Request.Description" class="form-label">Description</label>
+            <textarea asp-for="Request.Description" class="form-control" rows="3"></textarea>
+            <span asp-validation-for="Request.Description" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Generate Bill</button>
+        <a asp-page="/Staff/Appointments/Index" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

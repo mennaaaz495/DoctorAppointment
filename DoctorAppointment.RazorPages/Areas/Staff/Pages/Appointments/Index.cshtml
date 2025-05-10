@@ -1,0 +1,50 @@
+﻿@page
+@model DoctorAppointment.RazorPages.Areas.Staff.Pages.Appointments.IndexModel
+@{
+    ViewData["Title"] = "Appointments";
+}
+
+<h2>Approved Appointments</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Appointment ID</th>
+            <th>Date</th>
+            <th>Patient ID</th>
+            <th>Doctor ID</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var appt in Model.ApprovedAppointments)
+        {
+            <tr>
+                <td>@appt.Id</td>
+                <td>@appt.Date.ToString("MM/dd/yyyy")</td>
+                <td>@appt.PatientId</td>
+                <td>@appt.DoctorId</td>
+               <td>
+                    <form method="get" asp-area="Staff" asp-page="/GenerateBill">
+                        <input type="hidden" name="appointmentId" value="@appt.Id" />
+        <button type="submit" class="btn btn-danger btn-sm">
+            <i class="fas fa-file-pdf"></i> Generate Invoice
+        </button>
+    </form>
+</td>
+
+
+
+            </tr>
+        }
+    </tbody>
+</table>

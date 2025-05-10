@@ -18,6 +18,7 @@ namespace DoctorAppointment.Persistence.Context
         }
 
         public DbSet<Appointment> Appointments { get; set; }
+        public DbSet<Bill> Bills { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -26,6 +27,7 @@ namespace DoctorAppointment.Persistence.Context
             modelBuilder.ApplyConfiguration<ApplicationRole>(new RoleConfiguration());
             modelBuilder.ApplyConfiguration<ApplicationUser>(new UserConfiguration());
             modelBuilder.ApplyConfiguration<Appointment>(new AppointmentConfiguration());
+            modelBuilder.ApplyConfiguration(new BillConfiguration());
 
             modelBuilder.Seed();
         }
