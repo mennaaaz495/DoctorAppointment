@@ -1,0 +1,33 @@
+name: Docker Build Test
+
+on:
+  push:
+    branches: [ main ]  # Trigger on push to the 'main' branch
+
+jobs:
+  docker-test:
+    runs-on: ubuntu-latest  # Use the latest Ubuntu environment
+
+    steps:
+      # Step 1: Check out the code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Docker Buildx (for multi-platform builds)
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # Step 3: Log in to Docker Hub (use your Docker Hub username and password stored in GitHub Secrets)
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}  # Docker Hub username (stored in GitHub Secrets)
+          password: ${{ secrets.DOCKER_PASSWORD }}  # Docker Hub password (stored in GitHub Secrets)
+
+      # Step 4: Build Docker image and tag it
+      - name: Build Docker image
+        run: docker build -t mennaaaz495/doctor-appointment-api:latest .
+
+      # Step 5: Push the Docker image to Docker Hub
+      - name: Push Docker image
+        run: docker push mennaaaz495/doctor-appointment-api:latest
